@@ -12,21 +12,19 @@ dependencies:
 
   verification_api:
     git:
-      url: https://scm.boodskap.io/Open/verification_api.git
+      url: https://github.com/boodskap/verification_api.git
 
   nocode_api:
     git:
-      url: https://scm.boodskap.io/Open/nocode_api.git
+      url: https://github.com/boodskap/nocode_api.git
 
   twinned_api:
     git:
-      url: https://scm.boodskap.io/Open/twinned_api.git
+      url: https://github.com/boodskap/twinned_api.git
 
   twinned_widgets:
-#    git:
-#      url: https://scm.boodskap.io/Flutter/twinned_widgets.git
-    path:
-      twinned_widgets
+    git:
+      url: https://github.com/boodskap/twinned_widgets.git
 
   google_fonts: ^5.0.0
   http: ^1.1.0
