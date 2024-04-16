@@ -16,13 +16,23 @@ class DefaultAssetView extends StatefulWidget {
   final String assetId;
   final OnAssetDoubleTapped onAssetDoubleTapped;
   final OnAssetAnalyticsTapped onAssetAnalyticsTapped;
-  const DefaultAssetView(
-      {super.key,
-      required this.twinned,
-      required this.authToken,
-      required this.assetId,
-      required this.onAssetDoubleTapped,
-      required this.onAssetAnalyticsTapped});
+  final TextStyle titleTextStyle;
+  final TextStyle infoTextStyle;
+  final TextStyle widgetTextStyle;
+  const DefaultAssetView({
+    super.key,
+    required this.twinned,
+    required this.authToken,
+    required this.assetId,
+    required this.onAssetDoubleTapped,
+    required this.onAssetAnalyticsTapped,
+    this.titleTextStyle =
+        const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+    this.infoTextStyle =
+        const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+    this.widgetTextStyle =
+        const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+  });
 
   @override
   State<DefaultAssetView> createState() => _DefaultAssetViewState();
@@ -52,14 +62,12 @@ class _DefaultAssetViewState extends BaseState<DefaultAssetView> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold),
+                  style: widget.titleTextStyle,
                 ),
                 divider(),
                 Text(
                   info,
-                  style: const TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.bold),
+                  style: widget.infoTextStyle,
                 ),
               ],
             ),
@@ -180,16 +188,8 @@ class _DefaultAssetViewState extends BaseState<DefaultAssetView> {
         totalFields += NoCodeUtils.getSortedFields(dm).length;
       }
 
-      double cardWidth = 220;
-      double cardHeight = 220;
-
-      if (totalFields > 2) {
-        cardWidth = 140;
-        cardHeight = 140;
-      } else if (totalFields > 1) {
-        cardWidth = 170;
-        cardHeight = 170;
-      }
+      double cardWidth = 130;
+      double cardHeight = 130;
 
       for (twin.DeviceData dd in _data) {
         if (lastReported < dd.updatedStamp) {
@@ -205,13 +205,13 @@ class _DefaultAssetViewState extends BaseState<DefaultAssetView> {
           SensorWidgetType type =
               NoCodeUtils.getSensorWidgetType(field, deviceModel);
           dynamic value = NoCodeUtils.getParameterValue(field, dd);
-          late Widget widget;
+          late Widget sensorWidget;
 
           if (type == SensorWidgetType.none) {
             if (icon.isEmpty) {
-              widget = const Icon(Icons.device_unknown_sharp);
+              sensorWidget = const Icon(Icons.device_unknown_sharp);
             } else {
-              widget = SizedBox(
+              sensorWidget = SizedBox(
                   width: 45, child: UserSession().getImage(dd.domainKey, icon));
             }
 
@@ -228,13 +228,12 @@ class _DefaultAssetViewState extends BaseState<DefaultAssetView> {
                         children: [
                           Text(
                             '$label : $value $unit',
-                            style: const TextStyle(
-                                fontSize: 10, fontWeight: FontWeight.bold),
+                            style: widget.widgetTextStyle,
                           ),
                           const SizedBox(
                             height: 8,
                           ),
-                          widget,
+                          sensorWidget,
                         ],
                       )),
                 ),
@@ -242,7 +241,7 @@ class _DefaultAssetViewState extends BaseState<DefaultAssetView> {
             });
           } else {
             var parameter = NoCodeUtils.getParameter(field, deviceModel);
-            widget = SensorWidget(
+            sensorWidget = SensorWidget(
               parameter: parameter!,
               deviceData: dd,
               tiny: false,
@@ -258,8 +257,8 @@ class _DefaultAssetViewState extends BaseState<DefaultAssetView> {
                       child: Container(
                           color: Colors.white,
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: widget,
+                            padding: const EdgeInsets.all(4.0),
+                            child: sensorWidget,
                           )))));
             });
           }
