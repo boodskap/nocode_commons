@@ -25,6 +25,10 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
       TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold);
   static event.EventEmitter layoutEvents = event.EventEmitter();
   static final Lock _lock = Lock();
+  static const Widget missingImage = Icon(
+    Icons.question_mark,
+    size: 25,
+  );
   bool loading = false;
 
   @override
