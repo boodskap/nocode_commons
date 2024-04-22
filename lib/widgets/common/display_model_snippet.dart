@@ -15,7 +15,7 @@ class SimpleDisplaySnippet extends StatelessWidget {
     List<String> values = [];
 
     values.add(cond.prefixText ?? '');
-    values.add(cond.value ?? '{{#}}');
+    values.add(cond.$value ?? '{{#}}');
     values.add(cond.suffixText ?? '');
 
     BoxDecoration? decoration;

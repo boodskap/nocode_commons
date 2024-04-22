@@ -89,7 +89,7 @@ class _EvaluatedDisplaySnippetState extends BaseState<EvaluatedDisplaySnippet> {
     List<String> values = [];
 
     values.add(widget.evaluatedDisplay.prefix);
-    values.add(widget.evaluatedDisplay.value);
+    values.add(widget.evaluatedDisplay.$value);
     values.add(widget.evaluatedDisplay.suffix);
 
     BoxDecoration? decoration;
