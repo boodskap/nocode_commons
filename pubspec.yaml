@@ -18,15 +18,11 @@ dependencies:
     git:
       url: https://github.com/boodskap/nocode_api.git
 
-  twinned_api:
-    git:
-      url: https://github.com/boodskap/twinned_api.git
-
   twinned_widgets:
-    git:
-      url: https://github.com/boodskap/twinned_widgets.git
-#    path:
-#      twinned_widgets
+#    git:
+#      url: https://github.com/boodskap/twinned_widgets.git
+    path:
+      twinned_widgets
 
   google_fonts: ^5.0.0
   http: ^1.1.0
