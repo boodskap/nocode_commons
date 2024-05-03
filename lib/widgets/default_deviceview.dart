@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:nocode_commons/core/base_state.dart';
 import 'package:nocode_commons/core/user_session.dart';
@@ -11,6 +13,7 @@ typedef OnDeviceDoubleTapped = Future<void> Function(twin.DeviceData dd);
 typedef OnDeviceAnalyticsTapped = Future<void> Function(twin.DeviceData dd);
 
 class DefaultDeviceView extends StatefulWidget {
+  final twin.DeviceData? deviceData;
   final String deviceId;
   final twin.Twinned twinned;
   final String authToken;
@@ -21,6 +24,7 @@ class DefaultDeviceView extends StatefulWidget {
   final TextStyle widgetTextStyle;
   const DefaultDeviceView({
     super.key,
+    this.deviceData,
     required this.deviceId,
     required this.twinned,
     required this.authToken,
@@ -118,33 +122,43 @@ class _DefaultDeviceViewState extends BaseState<DefaultDeviceView> {
     refresh();
 
     await execute(() async {
-      var res = await widget.twinned.getDevice(
-          apikey: widget.authToken,
-          deviceId: widget.deviceId,
-          isHardwareDevice: false);
-      if (validateResponse(res)) {
-        twin.Device device = res.body!.entity!;
-        title = device.name;
-        var dRes = await widget.twinned.getDeviceData(
-          apikey: widget.authToken,
-          deviceId: widget.deviceId,
-          isHardwareDevice: false,
-        );
+      if (null != widget.deviceData) {
+        _data = widget.deviceData;
+        title = _data!.deviceName ?? '-';
+      } else {
+        var res = await widget.twinned.getDevice(
+            apikey: widget.authToken,
+            deviceId: widget.deviceId,
+            isHardwareDevice: false);
+        if (validateResponse(res)) {
+          twin.Device device = res.body!.entity!;
+          title = device.name;
+          var dRes = await widget.twinned.getDeviceData(
+            apikey: widget.authToken,
+            deviceId: widget.deviceId,
+            isHardwareDevice: false,
+          );
 
-        if (validateResponse(dRes)) {
-          _data = dRes.body?.data;
+          if (validateResponse(dRes)) {
+            _data = dRes.body?.data;
+          }
         }
       }
+
       if (null == _data) return;
 
       twin.DeviceData dd = _data!;
       int lastReported = 0;
       twin.DeviceModel? model;
 
-      _components.add(DeviceComponentView(
-          twinned: widget.twinned,
-          authToken: widget.authToken,
-          deviceData: dd));
+      if (dd.alarms.length + dd.displays.length > 0) {
+        debugPrint('*** ADDING ALARMS ***');
+        debugPrint(jsonEncode(dd));
+        _components.add(DeviceComponentView(
+            twinned: widget.twinned,
+            authToken: widget.authToken,
+            deviceData: dd));
+      }
 
       var mRes = await widget.twinned
           .getDeviceModel(apikey: widget.authToken, modelId: _data!.modelId);
