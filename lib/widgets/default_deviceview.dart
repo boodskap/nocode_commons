@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nocode_commons/core/base_state.dart';
 import 'package:nocode_commons/core/user_session.dart';
 import 'package:nocode_commons/util/nocode_utils.dart';
+import 'package:nocode_commons/widgets/device_component.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as twin;
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:twinned_widgets/sensor_widget.dart';
@@ -38,12 +39,9 @@ class DefaultDeviceView extends StatefulWidget {
 }
 
 class _DefaultDeviceViewState extends BaseState<DefaultDeviceView> {
-  final List<Widget> _alarms = [];
-  final List<Widget> _displays = [];
-  final List<Widget> _controls = [];
   final List<Widget> _fields = [];
+  final List<Widget> _components = [];
   twin.DeviceData? _data;
-  //Widget image = const Icon(Icons.image);
   String title = '?';
   String info = '?';
   String reported = '';
@@ -68,35 +66,16 @@ class _DefaultDeviceViewState extends BaseState<DefaultDeviceView> {
                   info,
                   style: widget.infoTextStyle,
                 ),
+                divider(),
+                Wrap(
+                  spacing: 4,
+                  children: _components,
+                ),
               ],
             ),
-            if (_alarms.isNotEmpty)
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: Row(
-                    children: _alarms,
-                  ),
-                ),
-              ),
             Expanded(
               child: Row(
                 children: [
-                  if (_controls.isNotEmpty)
-                    Expanded(
-                        child: Column(
-                      children: [
-                        //Expanded(child: Center(child: image)),
-                        Expanded(
-                          child: SingleChildScrollView(
-                              child: Wrap(
-                            spacing: 8,
-                            children: _controls,
-                          )),
-                        ),
-                      ],
-                    )),
                   if (_fields.isNotEmpty)
                     Expanded(
                         flex: 3,
@@ -112,17 +91,6 @@ class _DefaultDeviceViewState extends BaseState<DefaultDeviceView> {
                 ],
               ),
             ),
-            divider(),
-            if (_displays.isNotEmpty)
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: Row(
-                    children: _displays,
-                  ),
-                ),
-              ),
             divider(),
             if (reported.isNotEmpty)
               Row(
@@ -144,9 +112,6 @@ class _DefaultDeviceViewState extends BaseState<DefaultDeviceView> {
     if (loading) return;
     loading = true;
 
-    _alarms.clear();
-    _displays.clear();
-    _controls.clear();
     _fields.clear();
     _data = null;
 
@@ -176,6 +141,11 @@ class _DefaultDeviceViewState extends BaseState<DefaultDeviceView> {
       int lastReported = 0;
       twin.DeviceModel? model;
 
+      _components.add(DeviceComponentView(
+          twinned: widget.twinned,
+          authToken: widget.authToken,
+          deviceData: dd));
+
       var mRes = await widget.twinned
           .getDeviceModel(apikey: widget.authToken, modelId: _data!.modelId);
 
@@ -201,6 +171,8 @@ class _DefaultDeviceViewState extends BaseState<DefaultDeviceView> {
         SensorWidgetType type = NoCodeUtils.getSensorWidgetType(field, model);
         dynamic value = NoCodeUtils.getParameterValue(field, dd);
         late Widget sensorWidget;
+        bool hasAnalytics =
+            dd.series!.contains(field) | dd.trends!.contains(field);
 
         if (type == SensorWidgetType.none) {
           if (icon.isEmpty) {
@@ -218,18 +190,25 @@ class _DefaultDeviceViewState extends BaseState<DefaultDeviceView> {
                 elevation: 5,
                 child: Container(
                     color: Colors.white,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          '$label : $value $unit',
-                          style: widget.widgetTextStyle,
-                        ),
-                        const SizedBox(
-                          height: 8,
-                        ),
-                        sensorWidget,
-                      ],
+                    child: InkWell(
+                      onTap: !hasAnalytics
+                          ? null
+                          : () {
+                              widget.onDeviceAnalyticsTapped(dd);
+                            },
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            '$label : $value $unit',
+                            style: widget.widgetTextStyle,
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          sensorWidget,
+                        ],
+                      ),
                     )),
               ),
             ));
@@ -249,12 +228,19 @@ class _DefaultDeviceViewState extends BaseState<DefaultDeviceView> {
                 height: cardHeight,
                 child: Card(
                     elevation: 5,
-                    child: Container(
-                        color: Colors.white,
-                        child: Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: sensorWidget,
-                        )))));
+                    child: InkWell(
+                      onTap: !hasAnalytics
+                          ? null
+                          : () {
+                              widget.onDeviceAnalyticsTapped(dd);
+                            },
+                      child: Container(
+                          color: Colors.white,
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: sensorWidget,
+                          )),
+                    ))));
           });
         }
       }
