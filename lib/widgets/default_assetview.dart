@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:nocode_commons/core/base_state.dart';
 import 'package:nocode_commons/core/user_session.dart';
 import 'package:nocode_commons/util/nocode_utils.dart';
+import 'package:nocode_commons/widgets/device_component.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as twin;
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:twinned_widgets/sensor_widget.dart';
@@ -39,11 +40,10 @@ class DefaultAssetView extends StatefulWidget {
 }
 
 class _DefaultAssetViewState extends BaseState<DefaultAssetView> {
-  final List<Widget> _alarms = [];
-  final List<Widget> _displays = [];
-  final List<Widget> _controls = [];
   final List<Widget> _fields = [];
   final List<twin.DeviceData> _data = [];
+  final List<Widget> _components = [];
+
   //Widget image = const Icon(Icons.image);
   String title = '?';
   String info = '?';
@@ -69,35 +69,16 @@ class _DefaultAssetViewState extends BaseState<DefaultAssetView> {
                   info,
                   style: widget.infoTextStyle,
                 ),
+                divider(),
+                Wrap(
+                  spacing: 4,
+                  children: _components,
+                ),
               ],
             ),
-            if (_alarms.isNotEmpty)
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: Row(
-                    children: _alarms,
-                  ),
-                ),
-              ),
             Expanded(
               child: Row(
                 children: [
-                  if (_controls.isNotEmpty)
-                    Expanded(
-                        child: Column(
-                      children: [
-                        //Expanded(child: Center(child: image)),
-                        Expanded(
-                          child: SingleChildScrollView(
-                              child: Wrap(
-                            spacing: 8,
-                            children: _controls,
-                          )),
-                        ),
-                      ],
-                    )),
                   if (_fields.isNotEmpty)
                     Expanded(
                         flex: 3,
@@ -113,17 +94,6 @@ class _DefaultAssetViewState extends BaseState<DefaultAssetView> {
                 ],
               ),
             ),
-            divider(),
-            if (_displays.isNotEmpty)
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: Row(
-                    children: _displays,
-                  ),
-                ),
-              ),
             divider(),
             if (reported.isNotEmpty)
               Row(
@@ -145,11 +115,9 @@ class _DefaultAssetViewState extends BaseState<DefaultAssetView> {
     if (loading) return;
     loading = true;
 
-    _alarms.clear();
-    _displays.clear();
-    _controls.clear();
     _fields.clear();
     _data.clear();
+    _components.clear();
 
     refresh();
 
@@ -182,10 +150,10 @@ class _DefaultAssetViewState extends BaseState<DefaultAssetView> {
         if (validateResponse(res)) {
           models[dd.modelId] = res.body!.entity!;
         }
-      }
-      int totalFields = 0;
-      for (twin.DeviceModel dm in models.values) {
-        totalFields += NoCodeUtils.getSortedFields(dm).length;
+        _components.add(DeviceComponentView(
+            twinned: widget.twinned,
+            authToken: widget.authToken,
+            deviceData: dd));
       }
 
       double cardWidth = 130;
@@ -206,6 +174,8 @@ class _DefaultAssetViewState extends BaseState<DefaultAssetView> {
               NoCodeUtils.getSensorWidgetType(field, deviceModel);
           dynamic value = NoCodeUtils.getParameterValue(field, dd);
           late Widget sensorWidget;
+          bool hasAnalytics =
+              dd.series!.contains(field) | dd.trends!.contains(field);
 
           if (type == SensorWidgetType.none) {
             if (icon.isEmpty) {
@@ -219,23 +189,30 @@ class _DefaultAssetViewState extends BaseState<DefaultAssetView> {
               _fields.add(SizedBox(
                 width: cardWidth,
                 height: cardHeight,
-                child: Card(
-                  elevation: 5,
-                  child: Container(
-                      color: Colors.white,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            '$label : $value $unit',
-                            style: widget.widgetTextStyle,
-                          ),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          sensorWidget,
-                        ],
-                      )),
+                child: InkWell(
+                  onTap: !hasAnalytics
+                      ? null
+                      : () {
+                          widget.onAssetAnalyticsTapped(dd);
+                        },
+                  child: Card(
+                    elevation: 5,
+                    child: Container(
+                        color: Colors.white,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              '$label : $value $unit',
+                              style: widget.widgetTextStyle,
+                            ),
+                            const SizedBox(
+                              height: 8,
+                            ),
+                            sensorWidget,
+                          ],
+                        )),
+                  ),
                 ),
               ));
             });
@@ -252,14 +229,21 @@ class _DefaultAssetViewState extends BaseState<DefaultAssetView> {
               _fields.add(SizedBox(
                   width: cardWidth,
                   height: cardHeight,
-                  child: Card(
-                      elevation: 5,
-                      child: Container(
-                          color: Colors.white,
-                          child: Padding(
-                            padding: const EdgeInsets.all(4.0),
-                            child: sensorWidget,
-                          )))));
+                  child: InkWell(
+                    onTap: !hasAnalytics
+                        ? null
+                        : () {
+                            widget.onAssetAnalyticsTapped(dd);
+                          },
+                    child: Card(
+                        elevation: 5,
+                        child: Container(
+                            color: Colors.white,
+                            child: Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: sensorWidget,
+                            ))),
+                  )));
             });
           }
         }

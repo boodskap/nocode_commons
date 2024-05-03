@@ -34,7 +34,7 @@ class _DeviceComponentViewState extends State<DeviceComponentView> {
           deviceData: widget.deviceData,
         ),
         Padding(
-          padding: const EdgeInsets.only(top:3,right:3),
+          padding: const EdgeInsets.only(top: 3, right: 3),
           child: EvaluatedDisplaysSnippet(
             twin: widget.twinned,
             authToken: widget.authToken,
