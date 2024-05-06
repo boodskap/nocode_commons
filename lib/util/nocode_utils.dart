@@ -90,4 +90,22 @@ class NoCodeUtils {
     }
     return null;
   }
+
+  static bool hasTimeSeries(String name, DeviceModel deviceModel) {
+    for (var p in deviceModel.parameters) {
+      if (p.name == name) {
+        return p.enableTimeSeries ?? false;
+      }
+    }
+    return false;
+  }
+
+  static bool hasTrends(String name, DeviceModel deviceModel) {
+    for (var p in deviceModel.parameters) {
+      if (p.name == name) {
+        return p.enableTrend ?? false;
+      }
+    }
+    return false;
+  }
 }
