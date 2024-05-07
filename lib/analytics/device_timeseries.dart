@@ -90,7 +90,7 @@ class _DeviceTimeSeriesWidgetState extends BaseState<DeviceTimeSeriesWidget> {
           beginStamp: widget.beignStamp,
           endStamp: widget.endStamp,
           page: 0,
-          size: 1000);
+          size: 96);
 
       if (validateResponse(res, shouldAlert: false)) {
         for (var value in res.body!.values!) {
