@@ -88,6 +88,7 @@ dependencies:
   flutter_map_line_editor: ^6.0.0
   timeago: ^3.6.1
   data_table_2: ^2.5.10
+  syncfusion_flutter_charts: ^25.1.42+1
 
 dev_dependencies:
   flutter_test:
