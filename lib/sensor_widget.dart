@@ -360,6 +360,7 @@ class SensorTypesDropdown extends StatefulWidget {
 
 class _SensorTypesDropdownState extends State<SensorTypesDropdown> {
   static const Map<SensorWidgetType, String> icons = {
+    SensorWidgetType.blank: 'blank.png',
     SensorWidgetType.conicalTank: 'conical_tank.png',
     SensorWidgetType.corkedBottle: 'corked_bottle.png',
     SensorWidgetType.cylindricalTank: 'cylindrical_tank.png',
