@@ -6,7 +6,7 @@ import 'package:nocode_commons/util/nocode_utils.dart';
 import 'package:nocode_commons/widgets/device_component.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as twin;
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:twinned_widgets/sensor_widget.dart';
+import 'package:nocode_commons/sensor_widget.dart';
 
 typedef OnAssetDoubleTapped = Future<void> Function(twin.DeviceData dd);
 typedef OnAssetAnalyticsTapped = Future<void> Function(twin.DeviceData dd);

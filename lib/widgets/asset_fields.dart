@@ -3,7 +3,7 @@ import 'package:nocode_commons/core/base_state.dart';
 import 'package:nocode_commons/core/user_session.dart';
 import 'package:nocode_commons/util/nocode_utils.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as twin;
-import 'package:twinned_widgets/sensor_widget.dart';
+import 'package:nocode_commons/sensor_widget.dart';
 
 class AssetFields extends StatefulWidget {
   final twin.Asset asset;

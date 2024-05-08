@@ -1,5 +1,5 @@
 import 'package:twinned_api/api/twinned.swagger.dart';
-import 'package:twinned_widgets/sensor_widget.dart';
+import '/sensor_widget.dart';
 
 class NoCodeUtils {
   static dynamic getParameterValue(String name, DeviceData dd) {
