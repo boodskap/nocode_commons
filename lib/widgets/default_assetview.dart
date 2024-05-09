@@ -139,6 +139,8 @@ class _DefaultAssetViewState extends BaseState<DefaultAssetView> {
         if (validateResponse(dRes)) {
           _data.addAll(dRes.body!.values!);
         }
+      } else {
+        debugPrint('ASSET NOT FOUND: ${widget.assetId}');
       }
       int lastReported = 0;
       Map<String, twin.DeviceModel> models = {};
