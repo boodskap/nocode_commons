@@ -108,4 +108,14 @@ class NoCodeUtils {
     }
     return false;
   }
+
+  static List<String> getTimeSeriesFields(DeviceModel deviceModel) {
+    List<String> fields = [];
+    for (var p in deviceModel.parameters) {
+      if (p.enableTimeSeries ?? false) {
+        fields.add(p.name);
+      }
+    }
+    return fields;
+  }
 }
