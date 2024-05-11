@@ -8,7 +8,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as twin;
 
 class DeviceFieldAnalytics extends StatefulWidget {
-  final String field;
+  final List<String> fields;
   final twin.DeviceData deviceData;
   final twin.DeviceModel deviceModel;
   final twin.Twinned twinned;
@@ -17,7 +17,7 @@ class DeviceFieldAnalytics extends StatefulWidget {
 
   const DeviceFieldAnalytics({
     super.key,
-    required this.field,
+    required this.fields,
     required this.deviceData,
     required this.deviceModel,
     required this.twinned,
@@ -31,9 +31,9 @@ class DeviceFieldAnalytics extends StatefulWidget {
 
 class _DeviceFieldAnalyticsState extends BaseState<DeviceFieldAnalytics> {
   ChartType chartType = ChartType.none;
-  late final String label;
-  late final String unit;
-  final List<TimeSeriesData> _chartData = [];
+  final Map<String, String> _labels = {};
+  final Map<String, String> _units = {};
+  final Map<String, List<TimeSeriesData>> _chartData = {};
   final ZoomPanBehavior zoomPanBehavior = ZoomPanBehavior(
     enableDoubleTapZooming: true,
     enableMouseWheelZooming: true,
@@ -49,14 +49,62 @@ class _DeviceFieldAnalyticsState extends BaseState<DeviceFieldAnalytics> {
 
   @override
   void initState() {
-    label = NoCodeUtils.getParameterLabel(widget.field, widget.deviceModel);
-    unit = NoCodeUtils.getParameterUnit(widget.field, widget.deviceModel);
+    for (var field in widget.fields) {
+      String label = NoCodeUtils.getParameterLabel(field, widget.deviceModel);
+      String unit = NoCodeUtils.getParameterUnit(field, widget.deviceModel);
+      _labels[field] = label;
+      _units[field] = unit;
+    }
 
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    List<CartesianSeries> series = [];
+
+    for (String field in widget.fields) {
+      if (null == _chartData[field]) {
+        continue;
+      }
+      String name = NoCodeUtils.getParameterLabel(field, widget.deviceModel);
+      if (chartType == ChartType.area) {
+        // Renders line chart
+        series.add(AreaSeries<TimeSeriesData, DateTime>(
+            name: name,
+            markerSettings: const MarkerSettings(isVisible: true),
+            dataSource: _chartData[field],
+            xValueMapper: (TimeSeriesData sales, _) => sales.dateTime,
+            yValueMapper: (TimeSeriesData sales, _) => sales.value));
+      } else if (chartType == ChartType.spline) {
+        // Renders line chart
+        series.add(SplineSeries<TimeSeriesData, DateTime>(
+            name: name,
+            markerSettings: const MarkerSettings(isVisible: true),
+            splineType: SplineType.cardinal,
+            //cardinalSplineTension: 0.05,
+            dataSource: _chartData[field],
+            xValueMapper: (TimeSeriesData sales, _) => sales.dateTime,
+            yValueMapper: (TimeSeriesData sales, _) => sales.value));
+      } else if (chartType == ChartType.scatter) {
+        // Renders line chart
+        series.add(ScatterSeries<TimeSeriesData, DateTime>(
+            name: name,
+            markerSettings: const MarkerSettings(isVisible: true),
+            dataSource: _chartData[field],
+            xValueMapper: (TimeSeriesData sales, _) => sales.dateTime,
+            yValueMapper: (TimeSeriesData sales, _) => sales.value));
+      } else {
+        // Renders line chart
+        series.add(LineSeries<TimeSeriesData, DateTime>(
+            name: name,
+            markerSettings: const MarkerSettings(isVisible: true),
+            dataSource: _chartData[field],
+            xValueMapper: (TimeSeriesData sales, _) => sales.dateTime,
+            yValueMapper: (TimeSeriesData sales, _) => sales.value));
+      }
+    }
+
     return Column(
       children: [
         Row(
@@ -190,53 +238,27 @@ class _DeviceFieldAnalyticsState extends BaseState<DeviceFieldAnalytics> {
             ),
           ],
         ),
-        Expanded(
-          child: SfCartesianChart(
-              primaryXAxis: DateTimeAxis(
-                title: const AxisTitle(
-                  text: 'Time',
-                  textStyle: TextStyle(fontWeight: FontWeight.bold),
+        if (series.isNotEmpty)
+          Expanded(
+            child: SfCartesianChart(
+                primaryXAxis: DateTimeAxis(
+                  title: const AxisTitle(
+                    text: 'Time',
+                    textStyle: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+                  dateFormat: DateFormat('MM/dd HH:mm:ss'),
                 ),
-                labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-                dateFormat: DateFormat('MM/dd HH:mm:ss'),
-              ),
-              primaryYAxis: NumericAxis(
-                title: AxisTitle(
-                    text: '$label ($unit)',
-                    textStyle: const TextStyle(fontWeight: FontWeight.bold)),
-                labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              zoomPanBehavior: zoomPanBehavior,
-              tooltipBehavior: tooltipBehavior(),
-              series: <CartesianSeries>[
-                if (chartType == ChartType.area) // Renders line chart
-                  AreaSeries<TimeSeriesData, DateTime>(
-                      markerSettings: const MarkerSettings(isVisible: true),
-                      dataSource: _chartData,
-                      xValueMapper: (TimeSeriesData sales, _) => sales.dateTime,
-                      yValueMapper: (TimeSeriesData sales, _) => sales.value)
-                else if (chartType == ChartType.spline) // Renders line chart
-                  SplineSeries<TimeSeriesData, DateTime>(
-                      markerSettings: const MarkerSettings(isVisible: true),
-                      splineType: SplineType.cardinal,
-                      //cardinalSplineTension: 0.05,
-                      dataSource: _chartData,
-                      xValueMapper: (TimeSeriesData sales, _) => sales.dateTime,
-                      yValueMapper: (TimeSeriesData sales, _) => sales.value)
-                else if (chartType == ChartType.scatter) // Renders line chart
-                  ScatterSeries<TimeSeriesData, DateTime>(
-                      markerSettings: const MarkerSettings(isVisible: true),
-                      dataSource: _chartData,
-                      xValueMapper: (TimeSeriesData sales, _) => sales.dateTime,
-                      yValueMapper: (TimeSeriesData sales, _) => sales.value)
-                else // Renders line chart
-                  LineSeries<TimeSeriesData, DateTime>(
-                      markerSettings: const MarkerSettings(isVisible: true),
-                      dataSource: _chartData,
-                      xValueMapper: (TimeSeriesData sales, _) => sales.dateTime,
-                      yValueMapper: (TimeSeriesData sales, _) => sales.value)
-              ]),
-        ),
+                primaryYAxis: const NumericAxis(
+                  rangePadding: ChartRangePadding.none,
+                  axisLine: AxisLine(),
+                  decimalPlaces: 2,
+                ),
+                zoomPanBehavior: zoomPanBehavior,
+                tooltipBehavior: tooltipBehavior(),
+                legend: const Legend(isVisible: true),
+                series: series),
+          ),
       ],
     );
   }
@@ -292,33 +314,36 @@ class _DeviceFieldAnalyticsState extends BaseState<DeviceFieldAnalytics> {
 
     loading = true;
     _chartData.clear();
-    List<TimeSeriesData> chartData = [];
     bool isRecent = (null == filter ||
         filter == twin.DeviceDataSeriesDeviceIdFieldPageSizeGetFilter.recent);
 
-    await execute(() async {
-      var res = await widget.twinned.getDeviceTimeSeries(
-          tz: DateTime.now().timeZoneName,
-          filter: filter,
-          apikey: widget.apiKey,
-          deviceId: widget.deviceData.deviceId,
-          field: widget.field,
-          beginStamp: beginStamp,
-          endStamp: endStamp,
-          page: 0,
-          size: isRecent ? 1000 : widget.pageSize);
+    for (var field in widget.fields) {
+      List<TimeSeriesData> chartData = [];
 
-      if (validateResponse(res, shouldAlert: false)) {
-        for (var value in res.body!.values!) {
-          if (null == value.data) continue;
-          Map<String, dynamic> fValues = value.data as Map<String, dynamic>;
-          chartData.add(TimeSeriesData(
-              millis: value.updatedStamp, value: fValues[widget.field] ?? 0.0));
+      await execute(() async {
+        var res = await widget.twinned.getDeviceTimeSeries(
+            tz: DateTime.now().timeZoneName,
+            filter: filter,
+            apikey: widget.apiKey,
+            deviceId: widget.deviceData.deviceId,
+            field: field,
+            beginStamp: beginStamp,
+            endStamp: endStamp,
+            page: 0,
+            size: isRecent ? 1000 : widget.pageSize);
+
+        if (validateResponse(res, shouldAlert: false)) {
+          for (var value in res.body!.values!) {
+            if (null == value.data) continue;
+            Map<String, dynamic> fValues = value.data as Map<String, dynamic>;
+            chartData.add(TimeSeriesData(
+                millis: value.updatedStamp, value: fValues[field] ?? 0.0));
+          }
         }
-      }
-    });
+      });
 
-    _chartData.addAll(chartData);
+      _chartData[field] = chartData;
+    }
 
     refresh();
     loading = false;
@@ -337,7 +362,7 @@ class _DeviceFieldAnalyticsState extends BaseState<DeviceFieldAnalytics> {
           return Padding(
             padding: const EdgeInsets.only(left: 8.0, right: 8.0),
             child: Text(
-              '${data.value} ($unit) - ${data.dateTime}',
+              '${data.value} (${_units[widget.fields[seriesIndex]]}) - ${data.dateTime}',
               style: const TextStyle(color: Colors.white),
             ),
           );
