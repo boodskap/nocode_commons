@@ -185,7 +185,7 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
       barrierDismissible: barrierDismissible, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(title),
+          title: title.isEmpty ? null : Text(title),
           content: SingleChildScrollView(
             child: SizedBox(width: width, height: height, child: body),
           ),
