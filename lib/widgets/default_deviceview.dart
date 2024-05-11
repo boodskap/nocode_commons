@@ -10,7 +10,8 @@ import 'package:timeago/timeago.dart' as timeago;
 import 'package:nocode_commons/sensor_widget.dart';
 
 typedef OnDeviceDoubleTapped = Future<void> Function(twin.DeviceData dd);
-typedef OnDeviceAnalyticsTapped = Future<void> Function(twin.DeviceData dd);
+typedef OnDeviceAnalyticsTapped = Future<void> Function(
+    String field, twin.DeviceModel mode, twin.DeviceData dd);
 
 class DefaultDeviceView extends StatefulWidget {
   final twin.DeviceData? deviceData;
@@ -208,7 +209,7 @@ class _DefaultDeviceViewState extends BaseState<DefaultDeviceView> {
                       onTap: !hasAnalytics
                           ? null
                           : () {
-                              widget.onDeviceAnalyticsTapped(dd);
+                              widget.onDeviceAnalyticsTapped(field, model!, dd);
                             },
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -246,7 +247,7 @@ class _DefaultDeviceViewState extends BaseState<DefaultDeviceView> {
                       onTap: !hasAnalytics
                           ? null
                           : () {
-                              widget.onDeviceAnalyticsTapped(dd);
+                              widget.onDeviceAnalyticsTapped(field, model!, dd);
                             },
                       child: Container(
                           color: Colors.white,

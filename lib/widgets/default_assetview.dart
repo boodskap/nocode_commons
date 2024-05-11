@@ -9,7 +9,8 @@ import 'package:timeago/timeago.dart' as timeago;
 import 'package:nocode_commons/sensor_widget.dart';
 
 typedef OnAssetDoubleTapped = Future<void> Function(twin.DeviceData dd);
-typedef OnAssetAnalyticsTapped = Future<void> Function(twin.DeviceData dd);
+typedef OnAssetAnalyticsTapped = Future<void> Function(
+    String field, twin.DeviceModel model, twin.DeviceData dd);
 
 class DefaultAssetView extends StatefulWidget {
   final twin.Twinned twinned;
@@ -195,7 +196,7 @@ class _DefaultAssetViewState extends BaseState<DefaultAssetView> {
                   onTap: !hasAnalytics
                       ? null
                       : () {
-                          widget.onAssetAnalyticsTapped(dd);
+                          widget.onAssetAnalyticsTapped(field, deviceModel, dd);
                         },
                   child: Card(
                     elevation: 5,
@@ -235,7 +236,8 @@ class _DefaultAssetViewState extends BaseState<DefaultAssetView> {
                     onTap: !hasAnalytics
                         ? null
                         : () {
-                            widget.onAssetAnalyticsTapped(dd);
+                            widget.onAssetAnalyticsTapped(
+                                field, deviceModel, dd);
                           },
                     child: Card(
                         elevation: 5,
