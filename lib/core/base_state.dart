@@ -206,16 +206,15 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
     if (debug) {
       debugPrint('Executing...');
     }
-    await _lock.synchronized(() async {
-      busy();
-      try {
-        await sync();
-      } catch (e, s) {
-        debugPrint('$e\n$s');
-      } finally {
-        busy(busy: false);
-      }
-    });
+    //await _lock.synchronized(() async {});
+    busy();
+    try {
+      await sync();
+    } catch (e, s) {
+      debugPrint('$e\n$s');
+    } finally {
+      busy(busy: false);
+    }
     if (debug) {
       debugPrint('Finished executing');
     }
