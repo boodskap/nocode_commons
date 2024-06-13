@@ -65,7 +65,7 @@ class MqttConnection {
         } else {
           debugPrint('** MQTT CONNECTED **');
           final String topic =
-              '/${UserSession().getLoginResponse()!.user.domainKey}/log/twin/#';
+              '/${UserSession().getLoginResponse()!.user!.domainKey}/log/twin/#';
 
           try {
             for (var s in _subs) {
