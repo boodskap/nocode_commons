@@ -123,7 +123,7 @@ class UserSession {
   String getAuthToken() {
     if (null != loginResponse) {
       //debugPrint('TOKEN: ${loginResponse!.authToken}');
-      return loginResponse!.authToken;
+      return loginResponse!.authToken ?? '';
     }
     return "";
   }
