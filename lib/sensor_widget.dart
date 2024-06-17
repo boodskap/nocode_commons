@@ -11,7 +11,6 @@ import 'package:nocode_commons/level/widgets/conical_tank.dart';
 import 'package:nocode_commons/level/widgets/corked_bottle.dart';
 import 'package:nocode_commons/level/widgets/cylinder_tank.dart';
 import 'package:nocode_commons/level/widgets/cylindrical_tank.dart';
-//import 'package:nocode_commons/level/widgets/cylindrical_tank2.dart';
 import 'package:nocode_commons/level/widgets/gauge.dart';
 import 'package:nocode_commons/level/widgets/rectangular_tank.dart';
 import 'package:nocode_commons/level/widgets/spherical_tank.dart';
