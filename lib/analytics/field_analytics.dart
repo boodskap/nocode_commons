@@ -337,7 +337,9 @@ class _DeviceFieldAnalyticsState extends BaseState<DeviceFieldAnalytics> {
             if (null == value.data) continue;
             Map<String, dynamic> fValues = value.data as Map<String, dynamic>;
             chartData.add(TimeSeriesData(
-                millis: value.updatedStamp, value: fValues[field] ?? 0.0));
+                millis: value.updatedStamp,
+                value: fValues[field] ?? 0.0,
+                recordId: value.id ?? ''));
           }
         }
       });

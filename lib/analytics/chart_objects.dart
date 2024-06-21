@@ -6,8 +6,10 @@ enum ChartType {
 }
 
 class TimeSeriesData {
-  TimeSeriesData({required int millis, required this.value})
+  TimeSeriesData(
+      {required int millis, required this.value, required this.recordId})
       : dateTime = DateTime.fromMillisecondsSinceEpoch(millis);
   final DateTime dateTime;
   final double value;
+  final String recordId;
 }
